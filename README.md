@@ -8,7 +8,7 @@
     * audios-training
     * audios-validation
 4. place the files "validation_list" and "testing_list" in the same area.
-the proyect area should look like this:
+the project area should look like this:
 ```
 --- project-directory/
     |--- _background_noise_/
