@@ -8,18 +8,18 @@ to preprare the area:
     * audios-training
     * audios-validation
 
-the proyect are should look like this:
-
+the proyect area should look like this:
+```
 --- project-directory/
-    |--- \_background\_noise_/
+    |--- _background_noise_/
     |--- audios-original/
     |--- audios-training/
     |--- audios-training/
-    |--- build\_noise\_slice.py
-    |--- build\_spectrograms.py
+    |--- build_noise_slice.py 
+    |--- build_spectrograms.py
     |--- cnn-model-train.py
-    |--- fill\_sounds.py
-    |--- sample\_prep.py
-    |--- training\_sort\_script.py
-    |--- validation\_sorting\_script.py
-
+    |--- fill_sounds.py
+    |--- sample_prep.py
+    |--- training_sort_script.py
+    |--- validation_sorting_script.py
+```
