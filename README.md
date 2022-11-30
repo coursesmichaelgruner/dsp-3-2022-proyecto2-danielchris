@@ -7,7 +7,7 @@
 3. create two directories:
     * audios-training
     * audios-validation
-
+4. place the files "validation_list" and "testing_list" in the same area.
 the proyect area should look like this:
 ```
 --- project-directory/
@@ -22,6 +22,8 @@ the proyect area should look like this:
     |--- sample_prep.py
     |--- training_sort_script.py
     |--- validation_sorting_script.py
+    |--- validation_list.txt
+    |--- testing_list.txt
 ```
 then execute `sample_prep.py`
 
