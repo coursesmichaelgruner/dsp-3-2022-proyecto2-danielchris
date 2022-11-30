@@ -1,4 +1,4 @@
-to preprare the area:
+## to preprare the area:
 
 1. place audio class directories  in a directory named "audios-original" in your project area (same path with scripts)
 
@@ -23,3 +23,8 @@ the proyect area should look like this:
     |--- training_sort_script.py
     |--- validation_sorting_script.py
 ```
+then execute `sample_prep.py`
+
+## training
+
+execute `cnn-model-train.py`
