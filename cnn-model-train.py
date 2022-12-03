@@ -22,9 +22,13 @@ classes = {'yes'        :0,
         }
 
 trn_set_path = 'spectrograms-training/'
+val_set_path = 'spectrograms-validation/'
 
 x_train = []
 y_train = []
+
+x_val = []
+y_val = []
 
 dirs = os.listdir(trn_set_path)
 
@@ -35,21 +39,39 @@ for audio_class in dirs:
         y_train.append(classes[audio_class])
         
         file_path = trn_set_path+audio_class+'/'+f
-        with open(trn_set_path+audio_class+'/'+f,'rb') as fspec:
+        with open(file_path,'rb') as fspec:
             #print(file_path)
             spectro = pickle.load(fspec)
             data_item = np.empty(list(spectro.shape)+[1])
             data_item[:,:,0] = spectro
             x_train.append(data_item)
 
-
+for audio_class in dirs:
+    files = os.listdir(val_set_path+audio_class)
+    for f in files:
+        
+        y_val.append(classes[audio_class])
+        
+        file_path = val_set_path+audio_class+'/'+f
+        with open(file_path,'rb') as fspec:
+            spectro = pickle.load(fspec)
+            data_item = np.empty(list(spectro.shape)+[1])
+            data_item[:,:,0] = spectro
+            x_val.append(data_item)
 
 
 y_train = np.asarray(y_train)
-#y_train = np.concatenate(y_train,y_train)
+y_val =np.asarray(y_val)
+
+
+print(y_val.shape)
+
 y_train = keras.utils.to_categorical(y_train,num_classes=12)
+y_val = keras.utils.to_categorical(y_val,num_classes=12)
 
 x_train = np.stack(x_train)
+x_val = np.stack(x_val)
+
 print(y_train.shape)
 print(x_train.shape)
 
@@ -88,6 +110,12 @@ model.compile(loss ='categorical_crossentropy',optimizer=opt,metrics=['accuracy'
 
 model.summary()
 
-if not (os.path.exists('spec_model')):
-    model.fit(x_train,y_train,epochs=25,batch_size=10)
+if not (os.path.exists('spec_model.h5')):
+    history = model.fit(x_train,y_train,epochs=25,batch_size=10)
     model.save('spec_model.h5')
+    loss, accuracy = model.evaluate(x_val,y_val,verbose=0)
+
+else:
+    loaded_model = keras.models.load_model("spec_model.h5")
+    loss, accuracy = loaded_model.evaluate(x_val,y_val)
+
