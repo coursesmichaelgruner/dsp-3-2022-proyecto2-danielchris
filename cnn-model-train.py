@@ -2,6 +2,7 @@ import pickle
 import librosa
 import numpy as np
 import os
+import psutil
 
 from tensorflow import keras
 from tensorflow.keras.models import Sequential
@@ -20,6 +21,11 @@ classes = {'yes'        :0,
            'unknown'    :10,
            'background' :11,
         }
+
+def cpu_usage(y_true, y_pred):
+    return psutil.cpu_percent()
+
+
 
 trn_set_path = 'spectrograms-training/'
 val_set_path = 'spectrograms-validation/'
@@ -106,16 +112,17 @@ model.add(Dense(12))
 model.add(Softmax())
 
 opt = keras.optimizers.Adam(learning_rate=0.0003)
-model.compile(loss ='categorical_crossentropy',optimizer=opt,metrics=['accuracy'])
+model.compile(loss ='categorical_crossentropy',optimizer=opt,metrics=['accuracy',cpu_usage])
 
 model.summary()
+keras.utils.plot_model(model,"model-cnn-spectrogram.png",show_shapes=True)
 
 if not (os.path.exists('spec_model.h5')):
     history = model.fit(x_train,y_train,epochs=25,batch_size=10)
     model.save('spec_model.h5')
-    loss, accuracy = model.evaluate(x_val,y_val,verbose=0)
+    _,loss, accuracy = model.evaluate(x_val,y_val)
 
 else:
-    loaded_model = keras.models.load_model("spec_model.h5")
-    loss, accuracy = loaded_model.evaluate(x_val,y_val)
+    loaded_model = keras.models.load_model("spec_model.h5", custom_objects = {'cpu_usage': cpu_usage})
+    _,loss, accuracy = loaded_model.evaluate(x_val,y_val)
 
