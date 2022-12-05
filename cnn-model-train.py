@@ -9,6 +9,7 @@ from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import *
 from keras.callbacks import Callback
 from scikitplot.metrics import plot_confusion_matrix, plot_roc
+from sklearn.metrics import classification_report
 
 from matplotlib import pyplot
 
@@ -190,3 +191,7 @@ else:
     plot_confusion_matrix(y_true_labeled, y_pred_labeled, ax=ax, labels=class_label)
     fig.savefig(os.path.join('performance_visualizations', f'confusion_matrix'))
 
+    labels=classes
+    labels.pop('background')
+
+    print(classification_report(y_true_class, y_pred_class, target_names=labels))
