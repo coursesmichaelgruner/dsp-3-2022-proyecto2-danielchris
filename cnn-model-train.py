@@ -157,6 +157,9 @@ if not (os.path.exists('spec_model.h5')):
     performance_cbk = PerformanceVisualizationCallback( model=model, validation_data=validation_data, image_dir='performance_visualizations')
     #history=model.fit(x_train,y_train,epochs=25,batch_size=10,verbose=1,validation_data=validation_data)
     history = model.fit(x_train,y_train,epochs=25,batch_size=10,verbose=1,validation_data=validation_data,callbacks=[performance_cbk])
+    print(len(batch_end_loss))
+    print(len(batch_end_accu))
+
     model.save('spec_model.h5')
     eval_history =  model.evaluate(x_val,y_val)
     pyplot.plot(history.history['accuracy'])
@@ -164,7 +167,5 @@ if not (os.path.exists('spec_model.h5')):
     pyplot.show()
 else:
     loaded_model = keras.models.load_model("spec_model.h5", custom_objects = {'cpu_usage': cpu_usage})
-    _,loss, accuracy = loaded_model.evaluate(x_val,y_val)
-
-print(len(batch_end_loss))
-print(len(batch_end_accu))
+    eval_history = loaded_model.evaluate(x_val,y_val)
+    print(eval_history)
