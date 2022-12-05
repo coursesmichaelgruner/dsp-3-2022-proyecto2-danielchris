@@ -14,16 +14,19 @@ from matplotlib import pyplot
 
 class PerformanceVisualizationCallback(Callback):
   def __init__(self, model, validation_data, image_dir):
-    super().__init__()
-    self.model = model
-    self.validation_data = validation_data
-
-    os.makedirs(image_dir, exist_ok=True)
-    self.image_dir = image_dir
-  
+      super().__init__()
+      self.model = model
+      self.validation_data = validation_data
+      os.makedirs(image_dir, exist_ok=True)
+      self.image_dir = image_dir
+      
   def on_train_batch_end(self, batch, logs = None):
       batch_end_loss.append(logs['loss'])
       batch_end_accu.append(logs['accuracy'])
+  
+  def on_test_batch_end(self, batch, logs = None):
+      batch_end_loss_test.append(logs['loss'])
+      batch_end_accu_test.append(logs['accuracy'])
 
  # def on_epoch_end(self,epoch,logs={}):
  #   y_pred = np.asarray(self.model.predict(self.validation_data[0]))
@@ -150,8 +153,11 @@ keras.utils.plot_model(model,"model-cnn-spectrogram.png",show_shapes=True)
 
 batch_end_loss = list()
 batch_end_accu = list()
+batch_end_loss_test = list()
+batch_end_accu_test = list()
 
 validation_data = x_val, y_val
+performance_cbk = PerformanceVisualizationCallback( model=model, validation_data=validation_data, image_dir='performance_visualizations')
 
 if not (os.path.exists('spec_model.h5')):
     performance_cbk = PerformanceVisualizationCallback( model=model, validation_data=validation_data, image_dir='performance_visualizations')
@@ -167,5 +173,7 @@ if not (os.path.exists('spec_model.h5')):
     pyplot.show()
 else:
     loaded_model = keras.models.load_model("spec_model.h5", custom_objects = {'cpu_usage': cpu_usage})
-    eval_history = loaded_model.evaluate(x_val,y_val)
-    print(eval_history)
+    eval_history = loaded_model.evaluate(x_val,y_val,callbacks = [performance_cbk])
+
+
+    
