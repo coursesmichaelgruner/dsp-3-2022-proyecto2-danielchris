@@ -19,7 +19,7 @@ for path in [test_path,val_path,train_path]:
 
     
     fig,ax = plt.subplots(figsize = (15,5))
-    ax.set_title((path.split('/')[0]).replace('-',' for ') + " distribution")
+    ax.set_title(('distribution of ' + path.split('/')[0]).replace('-',' for ').replace('audios','audio samples'))
     plt.bar(audio_class,files_per_class) 
     plt.savefig(path.replace('/','.png'))
 
