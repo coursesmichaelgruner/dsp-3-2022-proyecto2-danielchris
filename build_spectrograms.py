@@ -12,14 +12,18 @@ wav_fs = 16000
 
 audio_val_path = 'audios-validation/'
 audio_trn_path = 'audios-training/'
+audio_tst_path = 'audios-testing/'
 val_path = 'spectrograms-validation/'
 trn_path = 'spectrograms-training/'
+tst_path = 'spectrograms-testing/'
 
 
-for obj_path in [val_path,trn_path]:
+for obj_path in [val_path,trn_path,tst_path]:
 
     if obj_path == val_path:
         path = audio_val_path
+    if obj_path == tst_path:
+        path = audio_tst_path
     else:
         path = audio_trn_path
     

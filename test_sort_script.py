@@ -11,34 +11,26 @@ unk_classes = []
 
 total = 0
 
-if os.path.exists('audios-test/unknown'):
-    shutil.rmtree('audios-test/unknown')
+if os.path.exists('audios-testing/unknown'):
+    shutil.rmtree('audios-testing/unknown')
 
-with open("test_list.txt") as f:
-    
-    vals = f.read();
-    val_list = vals.split("\n")[:-1]     
-    for line in val_list:
-        current_class = line.split("/")[0] 
-        
-        if not os.path.exists('audios-test/'+ current_class):
-            os.mkdir('audios-test/'+current_class)
-        shutil.copyfile('audios-original/'+ line, 'audios-test/'+ line)
-   
-dirs = os.listdir('audios-test/')
-os.mkdir('audios-test/unknown')
+custom_testing_dir = os.listdir('test-audio')
 
-for directory in dirs:
-    if directory not in classes:
-        files = os.listdir('audios-test/'+ directory)
-        num = 0
-        for f in files:
-            path = 'audios-test/'+ directory + '/' + f
-            newpath ='audios-test/unknown/'+ f
-            if not os.path.exists(newpath):
-                shutil.move(path,newpath)
-                num += 1
-            if num >= 13:
+for f in custom_testing_dir:
+    current_class = f.split('-')[0]
+    if not os.path.exists('audios-testing/'+current_class):
+        os.mkdir('audios-testing/'+current_class)
+    shutil.copyfile('test-audio/'+f,'audios-testing/'+current_class+'/'+f)
+
+os.mkdir('audios-testing/unknown')
+
+with open('testing_list.txt') as testing_list:
+    counter = 0
+    for line in testing_list:
+        line = line.split('\n')[0]
+        current_class = line.split('/')[0]
+        if not current_class in classes:
+            shutil.copyfile('audios-original/' + line, 'audios-testing/unknown/'+(line.split('/')[1]))
+            counter+=1
+            if counter == 10:
                 break
-        shutil.rmtree('audios-test/'+ directory)
-

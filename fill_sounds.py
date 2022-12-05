@@ -6,11 +6,12 @@ import numpy as np
 
 path_t = 'audios-training/' 
 path_v = 'audios-validation/'
+path_test = 'audios-testing/'
 
 dirs_val = os.listdir(path_t)
 
 newaudio = [];
-for path in [path_t,path_v]:
+for path in [path_t,path_v,path_test]:
     for directory in dirs_val:
         files = os.listdir(path+directory)
         for f in files:

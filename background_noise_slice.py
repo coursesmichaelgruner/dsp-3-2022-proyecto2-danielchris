@@ -6,12 +6,16 @@ print("SLICING BACKGROUND AUDIO SAMPLES")
 path = '_background_noise_/'
 newpath_t = 'audios-training/background/'
 newpath_v = 'audios-validation/background/'
+newpath_test = 'audios-testing/background/'
 
 if not os.path.exists(newpath_t):
     os.mkdir(newpath_t)
 
 if not os.path.exists(newpath_v):
     os.mkdir(newpath_v)
+
+if not os.path.exists(newpath_test):
+    os.mkdir(newpath_test)
 
 nfile = 0
 
@@ -23,6 +27,8 @@ for f in files:
         audio_slice = audio[i*1000:(i+1)*1000]
         if(i % 10 == 0):
             audio_slice.export(newpath_v+f.replace('.wav',str(i)+".wav"), format="wav")
+        if(i % 100 == 0):
+            audio_slice.export(newpath_test+f.replace('.wav',str(i)+".wav"), format="wav")
         else:    
             audio_slice.export(newpath_t+f.replace('.wav',str(i)+".wav"), format="wav")
         
