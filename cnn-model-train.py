@@ -160,7 +160,6 @@ validation_data = x_val, y_val
 performance_cbk = PerformanceVisualizationCallback( model=model, validation_data=validation_data, image_dir='performance_visualizations')
 
 if not (os.path.exists('spec_model.h5')):
-    performance_cbk = PerformanceVisualizationCallback( model=model, validation_data=validation_data, image_dir='performance_visualizations')
     #history=model.fit(x_train,y_train,epochs=25,batch_size=10,verbose=1,validation_data=validation_data)
     history = model.fit(x_train,y_train,epochs=25,batch_size=10,verbose=1,validation_data=validation_data,callbacks=[performance_cbk])
     print(len(batch_end_loss))
@@ -174,11 +173,6 @@ if not (os.path.exists('spec_model.h5')):
 else:
     loaded_model = keras.models.load_model("spec_model.h5", custom_objects = {'cpu_usage': cpu_usage})
     eval_history = loaded_model.evaluate(x_val,y_val,callbacks = [performance_cbk])
-<<<<<<< HEAD
-
-
-    
-=======
     print(eval_history)
     
     y_pred = np.asarray(loaded_model.predict(validation_data[0]))
@@ -190,4 +184,3 @@ else:
     plot_confusion_matrix(y_true_class, y_pred_class, ax=ax)
     fig.savefig(os.path.join('performance_visualizations', f'confusion_matrix'))
 
->>>>>>> 58bea7152218f86007029934ae4244ea92cece78
