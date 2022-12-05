@@ -174,6 +174,20 @@ if not (os.path.exists('spec_model.h5')):
 else:
     loaded_model = keras.models.load_model("spec_model.h5", custom_objects = {'cpu_usage': cpu_usage})
     eval_history = loaded_model.evaluate(x_val,y_val,callbacks = [performance_cbk])
+<<<<<<< HEAD
 
 
     
+=======
+    print(eval_history)
+    
+    y_pred = np.asarray(loaded_model.predict(validation_data[0]))
+    y_true = validation_data[1]
+    y_pred_class = np.argmax(y_pred, axis=1)
+    y_true_class = np.argmax(y_true,axis=1)
+
+    fig, ax = pyplot.subplots(figsize=(16,13))
+    plot_confusion_matrix(y_true_class, y_pred_class, ax=ax)
+    fig.savefig(os.path.join('performance_visualizations', f'confusion_matrix'))
+
+>>>>>>> 58bea7152218f86007029934ae4244ea92cece78
