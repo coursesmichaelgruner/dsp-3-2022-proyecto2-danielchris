@@ -178,9 +178,19 @@ else:
     y_pred = np.asarray(loaded_model.predict(validation_data[0]))
     y_true = validation_data[1]
     y_pred_class = np.argmax(y_pred, axis=1)
-    y_true_class = np.argmax(y_true,axis=1)
+    y_true_class = np.argmax(y_true, axis=1)
+    
+    class_label = list(classes.keys())
+
+    y_pred_labeled = []
+    y_true_labeled = []
+
+    for i in y_pred_class:
+        y_pred_labeled.append(class_label[i])
+    for i in y_true_class:
+        y_true_labeled.append(class_label[i])
 
     fig, ax = pyplot.subplots(figsize=(16,13))
-    plot_confusion_matrix(y_true_class, y_pred_class, ax=ax)
+    plot_confusion_matrix(y_true_labeled, y_pred_labeled, ax=ax, labels=class_label)
     fig.savefig(os.path.join('performance_visualizations', f'confusion_matrix'))
 
