@@ -7,6 +7,33 @@ import psutil
 from tensorflow import keras
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import *
+from keras.callbacks import Callback
+from scikitplot.metrics import plot_confusion_matrix, plot_roc
+
+from matplotlib import pyplot
+
+class PerformanceVisualizationCallback(Callback):
+  def __init__(self, model, validation_data, image_dir):
+    super().__init__()
+    self.model = model
+    self.validation_data = validation_data
+
+    os.makedirs(image_dir, exist_ok=True)
+    self.image_dir = image_dir
+
+  def on_epoch_end(self,epoch,logs={}):
+    y_pred = np.asarray(self.model.predict(self.validation_data[0]))
+    y_true = self.validation_data[1]
+    y_pred_class = np.argmax(y_pred, axis=1)
+    y_true_class = np.argmax(y_true,axis=1)
+
+    fig, ax = pyplot.subplots(figsize=(16,13))
+    plot_confusion_matrix(y_true_class, y_pred_class, ax=ax)
+    fig.savefig(os.path.join(self.image_dir, f'confusion_matrix_epoch_{epoch}'))
+
+    #fig, ax = pyplot.subplots(figsize=(16,13))
+    #plot_roc(y_true, y_pred, ax=ax)
+    #fig.savefig(os.path.join(self.image_dir, f'roc_curve_epoch_{epoch}'))
 
 classes = {'yes'        :0,
            'no'         :1,
@@ -112,16 +139,47 @@ model.add(Dense(12))
 model.add(Softmax())
 
 opt = keras.optimizers.Adam(learning_rate=0.0003)
-model.compile(loss ='categorical_crossentropy',optimizer=opt,metrics=['accuracy',cpu_usage])
+model.compile(loss ='categorical_crossentropy',optimizer=opt,metrics=['accuracy',cpu_usage,'mae'])
 
 model.summary()
 keras.utils.plot_model(model,"model-cnn-spectrogram.png",show_shapes=True)
 
-if not (os.path.exists('spec_model.h5')):
-    history = model.fit(x_train,y_train,epochs=25,batch_size=10)
+if not (os.path.exists('spec_model')):
+    val_set_path = 'spectrograms-validation/'
+    
+    x_val = []
+    y_val = []
+
+    dirs = os.listdir(val_set_path)
+
+    for audio_class in dirs:
+        files = os.listdir(val_set_path+audio_class)
+        for f in files:
+    
+            y_val.append(classes[audio_class])
+    
+            file_path = val_set_path+audio_class+'/'+f
+            with open(val_set_path+audio_class+'/'+f,'rb') as fspec:
+                #print(file_path)
+                spectro = pickle.load(fspec)
+                data_item = np.empty(list(spectro.shape)+[1])
+                data_item[:,:,0] = spectro
+                x_val.append(data_item)
+    y_val = np.asarray(y_val)
+    y_val = keras.utils.to_categorical(y_val,num_classes=12)
+
+    x_val = np.stack(x_val)
+
+    validation_data = x_val, y_val
+
+    performance_cbk = PerformanceVisualizationCallback( model=model, validation_data=validation_data, image_dir='performance_visualizations')
+    #history=model.fit(x_train,y_train,epochs=25,batch_size=10,verbose=1,validation_data=validation_data)
+    history=model.fit(x_train,y_train,epochs=25,batch_size=10,verbose=1,validation_data=validation_data,callbacks=[performance_cbk])
     model.save('spec_model.h5')
     _,loss, accuracy = model.evaluate(x_val,y_val)
-
+    pyplot.plot(history.history['accuracy'])
+    pyplot.plot(history.history['mae'])
+    pyplot.show()
 else:
     loaded_model = keras.models.load_model("spec_model.h5", custom_objects = {'cpu_usage': cpu_usage})
     _,loss, accuracy = loaded_model.evaluate(x_val,y_val)
