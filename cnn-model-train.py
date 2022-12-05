@@ -65,6 +65,8 @@ def cpu_usage(y_true, y_pred):
 trn_set_path = 'spectrograms-training/'
 val_set_path = 'spectrograms-validation/'
 
+vis_path = 'performance_visualizations'
+
 x_train = []
 y_train = []
 
@@ -158,15 +160,60 @@ performance_cbk = PerformanceVisualizationCallback( model=model, validation_data
 
 if not (os.path.exists('spec_model.h5')):
     #history=model.fit(x_train,y_train,epochs=25,batch_size=10,verbose=1,validation_data=validation_data)
-    history = model.fit(x_train,y_train,epochs=25,batch_size=10,verbose=1,validation_data=validation_data,callbacks=[performance_cbk])
+    history = model.fit(x_train,y_train,epochs=2,batch_size=10,verbose=1,validation_data=validation_data,callbacks=[performance_cbk])
     print(len(batch_end_loss))
     print(len(batch_end_accu))
 
     model.save('spec_model.h5')
     eval_history =  model.evaluate(x_val,y_val)
-    pyplot.plot(history.history['accuracy'])
-    pyplot.plot(history.history['mae'])
+
+    pyplot.figure(1)
+    pyplot.plot(batch_end_loss)
+    pyplot.title('Batch End Loss')
+    pyplot.xlabel('Batch');
+    pyplot.savefig(os.path.join(vis_path, f'BatchLoss'))
     pyplot.show()
+
+    pyplot.figure(2)
+    pyplot.plot(batch_end_accu)
+    pyplot.title('Batch End Accuracy')
+    pyplot.xlabel('Batch');
+    pyplot.savefig(os.path.join(vis_path, f'BatchAccuracy'))
+    pyplot.show()
+
+    pyplot.figure(3)
+    pyplot.plot(history.history['loss'])
+    pyplot.title('Epoch End Loss')
+    pyplot.xlabel('Epoch');
+    pyplot.savefig(os.path.join(vis_path, f'EpochLoss'))
+    pyplot.show()
+
+    pyplot.figure(4)
+    pyplot.plot(history.history['accuracy'])
+    pyplot.title('Epoch End Accuracy')
+    pyplot.xlabel('Epoch');
+    pyplot.savefig(os.path.join(vis_path, f'EpochAccuracy'))
+    pyplot.show()
+
+    pyplot.figure(5)
+    pyplot.plot(history.history['mae'])
+    pyplot.title('Epoch End Mean Absolute Error')
+    pyplot.xlabel('Epoch');
+    pyplot.savefig(os.path.join(vis_path, f'EpochMAE'))
+    pyplot.show()
+
+    pyplot.figure(6)
+    pyplot.plot(history.history['val_loss'])
+    pyplot.title('Epoch End Validation Loss')
+    pyplot.xlabel('Epoch')
+    pyplot.savefig(os.path.join(vis_path, f'EpochValLoss'))
+
+    pyplot.figure(7)
+    pyplot.plot(history.history['val_accuracy'])
+    pyplot.title('Epoch End Validation Accuracy')
+    pyplot.xlabel('Epoch')
+    pyplot.savefig(os.path.join(vis_path, f'EpochValAccuracy'))
+   
 else:
     loaded_model = keras.models.load_model("spec_model.h5", custom_objects = {'cpu_usage': cpu_usage})
     eval_history = loaded_model.evaluate(x_val,y_val,callbacks = [performance_cbk])
@@ -191,7 +238,4 @@ else:
     plot_confusion_matrix(y_true_labeled, y_pred_labeled, ax=ax, labels=class_label)
     fig.savefig(os.path.join('performance_visualizations', f'confusion_matrix'))
 
-    labels=classes
-    labels.pop('background')
-
-    print(classification_report(y_true_class, y_pred_class, target_names=labels))
+    print(classification_report(y_true_class, y_pred_class, target_names=classes))
