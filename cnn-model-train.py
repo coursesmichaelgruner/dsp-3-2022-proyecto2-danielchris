@@ -99,10 +99,8 @@ for audio_class in dirs:
             data_item[:,:,0] = spectro
             x_val.append(data_item)
 
-
 y_train = np.asarray(y_train)
 y_val =np.asarray(y_val)
-
 
 print(y_val.shape)
 
@@ -115,8 +113,6 @@ x_val = np.stack(x_val)
 print(y_train.shape)
 print(x_train.shape)
 
-#xshape = (len(x_train),len(x_train[0]),len(x_train[0][0]),len(x_train[0][0][0]))
-#print(xshape)
 print(x_train.shape[1:])
 
 model = Sequential()
