@@ -145,7 +145,7 @@ model.add(Dense(12))
 model.add(Softmax())
 
 opt = keras.optimizers.Adam(learning_rate=0.0003)
-model.compile(loss ='categorical_crossentropy',optimizer=opt,metrics=['accuracy',cpu_usage,'mae'])
+model.compile(loss ='categorical_crossentropy',optimizer=opt,metrics=['accuracy',cpu_usage,'mae','mse'])
 
 model.summary()
 keras.utils.plot_model(model,"model-cnn-spectrogram.png",show_shapes=True)
@@ -160,7 +160,7 @@ performance_cbk = PerformanceVisualizationCallback( model=model, validation_data
 
 if not (os.path.exists('spec_model.h5')):
     #history=model.fit(x_train,y_train,epochs=25,batch_size=10,verbose=1,validation_data=validation_data)
-    history = model.fit(x_train,y_train,epochs=2,batch_size=10,verbose=1,validation_data=validation_data,callbacks=[performance_cbk])
+    history = model.fit(x_train,y_train,epochs=25,batch_size=10,verbose=1,validation_data=validation_data,callbacks=[performance_cbk])
     print(len(batch_end_loss))
     print(len(batch_end_accu))
 
@@ -213,6 +213,20 @@ if not (os.path.exists('spec_model.h5')):
     pyplot.title('Epoch End Validation Accuracy')
     pyplot.xlabel('Epoch')
     pyplot.savefig(os.path.join(vis_path, f'EpochValAccuracy'))
+
+    pyplot.figure(8)
+    pyplot.plot(history.history['mse'])
+    pyplot.title('Epoch End Mean Squared Error')
+    pyplot.xlabel('Epoch');
+    pyplot.savefig(os.path.join(vis_path, f'EpochMSE'))
+    pyplot.show()
+
+    pyplot.figure(9)
+    pyplot.plot(history.history['val_mse'])
+    pyplot.title('Epoch End Validation Mean Squared Error')
+    pyplot.xlabel('Epoch');
+    pyplot.savefig(os.path.join(vis_path, f'EpochValMSE'))
+    pyplot.show()
    
 else:
     loaded_model = keras.models.load_model("spec_model.h5", custom_objects = {'cpu_usage': cpu_usage})
